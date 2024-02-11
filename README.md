@@ -1,9 +1,9 @@
 # NN_Project
-##Description:
+## Description:
 This repo is for the Semester Project for Neural Networks. The group members are Seth Pickford(spickfor) and Alex Castillo (acastil5)
 
 
-##Part 1:
+## Part 1:
     We aren't exactly sure which dataset we are going to use.  We have looked over the suggested datasets and can see that either FRGC's dataset or BioID's dataset could be viable
     to use in this project.  We are leaning towards BioID right now because it doesn't have quite as many images, which could allow quicker training and it also focuses on frontal 
     facing images which will most likely be easier to train a model on.  However, we aren't exactly sure how much time it will take to train so we could end up switching because more datapoints means that training can be more effective.  Along these same lines, if we don't think that we have enough data, we can lean on the creation of synthetic images to give us more information to train with. 
