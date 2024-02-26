@@ -15,3 +15,25 @@ This repo is for the Semester Project for Neural Networks. The group members are
 
 For this part we worked together to brainstorm ideas and how we could possibly go about creating the project.  We also used ChatGPT to help us brainstorm and think of an outline of how to
 go about creating the project.
+
+
+## Part 2
+
+Source: https://www.bioid.com/face-database/
+There are a couple of key things that we need to focus on for the training versus the validation subsets.  First, we need to make sure that
+both subsets contain images that have variability in lighting and background.  We want the photos of our faces to be varied between the 
+subsets so that the model can better generalize all these different conditions, rather than learning to do only one specific looking type
+of black and white photo.  Next we wnat a variety of poses and facial expressions.  We don't just want one type of facial expression to
+lead to biases within our model.  We also want to make sure that we are representing all of our subjects equally.  We don't want more photos
+of one person to show up than others in our different subsets because, say it happens in our training set, it could lead to bias in our model
+where it becomes overly tuned to one specific group or one specific person and then struggles to generalize other groups.
+The BioID dataset contains 1521 gray scale images which represent 23 different people.  This means that each person has about 66 samples, with
+some having more and some having less.  This needs to be looked into further to make sure that these differences aren't large enough to cause
+any issues in training our model.  Each photo is 384x286 pixels and is rendered in black and white.  Additionally, each photo has had the eye 
+positions of the person set manually.  Additionally, the dataset contains files other than the photos.  These files contain the x and y
+coordinates of the person's eyes, which will be extremely useful for calculating facial distances and positioning.
+When trying to access the FRGC database, we got a message saying "We're sorry, we were unable to locate the site /public-cvrl/data-sets."
+
+
+Each of us has looked at the datasets and analyzed their photos to figure out how we can use them and to figure out what needs to 
+be different between our subsets to try and get the most out of our data.
