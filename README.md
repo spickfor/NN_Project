@@ -61,3 +61,53 @@ we just aren't sure how viable it could be.
 
 Each of us has looked at the datasets and analyzed their photos to figure out how we can use them and to figure out what needs to 
 be different between our subsets to try and get the most out of our data.
+
+
+## Part 3
+We have changed our project idea a bit because of the dataset that we are using.  Originally we wanted to do a facial recognition
+model, but due to a lack of names or labels for people in our dataset, we only have eye positions, we have decided to move away
+from that idea.  Instead we are designing a model that will predict eye positions in an image.  With this we could then try to 
+use this data from the model to implement facial recognition for other datasets since the model will find eyes in the face and this
+could be useful for face measurements or we also had the idea of possibly using it for something such as overlaying glasses images
+over the eyes.  We also may just leave the eye finding model as is, we aren't 100 percent sure.  If you have a suggestion or idea or
+don't like any of these, it would be great to hear what you think.
+
+The Neural Network architecture that we have chosen so far for this task is a simpole convolutional Neural Network.  The CNN consists
+of two convolutional layers that are followed by max-pooling layers and two fully connected layers.  We tried out using 3 convolutional
+layers to try to capture more complexity within our model, but the extra layer actually seemed to make the model less accurate as well
+as made it seem to be more erratic as it got to higher epochs.
+Convolutional Layers:  The first convolutional layer, which is conv1 in the code, has 32 filters with a kernal size of 3x3 and a
+padding of 1 to help us preserve spatial information.  The second convolutional layer, which is conv2 in the code, has 64 filters with
+3x3 kernel size and a padding of 1, just like in the first layer.  The point of these layers is feature extraction.
+Max Pooling Layers:  After each convolutional layer, max pooling layers are applied to reduce the computational complexity and extract
+dominant featuers.  The kernel size for the max pooling layers is 2x2.
+Fully Connected Layers: After the convolutional layers, the feature maps are flattened and passed to fully connected layers which are 
+fc2 and fc1.  these layers perfomr classification based on the learned feautures from the previous layers.  The first fully connected
+layer has 128 neurons and the output layer has 4 neurons which output the models prediction for the eye positions of the person in
+the picture.
+For the activation function we used ReLU.  It is applied after each convolutional layer in order to introduce a non-linear aspect to
+the model in order for it to be able to learn non-linear/ more complex patterns within our data.  We chose ReLU because we have seen
+it before, it is pretty simple, and doesn't take a whole lot of computational power.
+For the Loss Function, we use Mean Squared Error becuase it is useful in models where it is predicting continuous values, such as
+the eye positions/coordinates of something in a photo.
+For the optimizer, we used Adam.  We really chose Adam because it has appeared before in practicals so we know about it some. 
+Classification Accuracy:  We took too long to do this project, which led to some issues with having enough time to run and validate
+or code.  This means that we still have work to do with figuring out optimized parameters.  However when doing tests, we saw training accuracies in the 70-80s and validation accuracies ranging from 70s to 90s in later epochs.  Issues come about in that the model has
+some consistancy issues with different epochs resulting in higher then lower accuracies.  This brings back the need to work more with
+our parameters to figure out which ones will result in more consistant model training.
+Observations:  Our accuracies for both our training and validation sets seemed to be decent, reaching 80s and even 90s at points, however, we struggled to figure out good epoch counts and get consistancy accross our models.  So while at points the models are good
+with both old and new images, we aren't consistant enough to have finished product.  In the future we need to buckle down and figure
+out the best way to consistantly train models as well as find the best parameters for the models to optimize predictions/accuracy.  Our model does seem to be predicting better on data that it has seen before, which may suggest that there is some overfitting going
+on.  To possibly combat this we may try to implement things such as dropout regularization or early stopping.  We will have to decide
+after we find optimized parameters because maybe they could also help mitiage this issue.  After we figure out this, we could look into
+data augumentation with either other datasets, which will mean preprocessing them, or also doing things such as rotation to change how
+things look so that the model can become better at more diverse images.  Right now all of the images are very similar.  We also want to
+add to our implementation a visual aspect that will put points over the eyes in the image.  This could allow us to use the model to 
+do fun things such as put sunglasses on people.  However, when attempting this earlier we ran into a lot of issues so this idea is 
+being benched for now until we actually get our model better.
+
+One thing I want to note is that we initially overlooked that we had to train a model and save it.  We have been training the model new
+every time, which isn't great, because we were trying to work out our code and figure out proper accuracies.  We will be pushing the model a bit late because of this as we have to train it.
+
+For the model, Seth did Dataloading/preprocessing as well as the creation of the CNN.  Alex worked on the training of the model and
+running it
