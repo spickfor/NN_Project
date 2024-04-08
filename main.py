@@ -156,6 +156,8 @@ for epoch in range(num_epochs):
 
 
 
+# Save the model's state dictionary
+torch.save(model.state_dict(), 'simple_cnn_model.pth')
 
 
 
