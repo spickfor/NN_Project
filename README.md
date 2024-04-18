@@ -111,3 +111,5 @@ every time, which isn't great, because we were trying to work out our code and f
 
 For the model, Seth did Dataloading/preprocessing as well as the creation of the CNN.  Alex worked on the training of the model and
 running it
+
+Link for the simple_cnn_model.pth file in Google Drive:  https://drive.google.com/drive/folders/1T1YN1qIgAQNGEo2e4YdpmSa_vyxQdLrd?usp=sharing 
