@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 
 
-
-
 import torch
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
@@ -62,35 +60,6 @@ class BioIDFaceDataset(Dataset):
 
 
 
-
-# Define transformations (normalization and resizing)
-transform = transforms.Compose([
-   transforms.Resize((384, 286)),
-   transforms.ToTensor(),
-   transforms.Normalize(mean=[0.5], std=[0.5])
-])
-
-
-# Create the dataset
-dataset = BioIDFaceDataset(data_folder='BioID-FaceDatabase-V1', transform=transform)
-
-
-
-
-
-
-# Create a DataLoader
-dataloader = DataLoader(dataset, batch_size=4, shuffle=True)
-
-
-# testing to make sure loaded properly
-print(f'Length of dataset: {len(dataset)}')
-
-
-
-
-
-
 class SimpleCNN(nn.Module):
    def __init__(self):
        super(SimpleCNN, self).__init__()
@@ -110,6 +79,42 @@ class SimpleCNN(nn.Module):
        return x
 
 
+# Function to convert points to bounding boxes
+def point_to_box(x, y, radius=5):
+    return [x - radius, y - radius, x + radius, y + radius]
+
+# Function to calculate IoU
+def calculate_iou(box1, box2):
+    x_left = max(box1[0], box2[0])
+    y_top = max(box1[1], box2[1])
+    x_right = min(box1[2], box2[2])
+    y_bottom = min(box1[3], box2[3])
+    if x_right < x_left or y_bottom < y_top:
+        return 0.0
+    intersection_area = (x_right - x_left) * (y_bottom - y_top)
+    box1_area = (box1[2] - box1[0]) * (box1[3] - box1[1])
+    box2_area = (box2[2] - box2[0]) * (box2[3] - box2[1])
+    union_area = box1_area + box2_area - intersection_area
+    return intersection_area / union_area
+
+
+# Define transformations (normalization and resizing)
+transform = transforms.Compose([
+   transforms.Resize((384, 286)),
+   transforms.ToTensor(),
+   transforms.Normalize(mean=[0.5], std=[0.5])
+])
+
+# Create the dataset
+dataset = BioIDFaceDataset(data_folder='BioID-FaceDatabase-V1', transform=transform)
+
+# Create a DataLoader
+dataloader = DataLoader(dataset, batch_size=4, shuffle=True)
+
+# testing to make sure loaded properly
+print(f'Length of dataset: {len(dataset)}')
+
+
   
 # Model create
 model = SimpleCNN()
@@ -118,41 +123,34 @@ criterion = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
 
-
-
 # Training loop
-threshold = 5 # 5 is a random num guess
+radius = 5      # our radius for IoU 
 num_epochs = 15
 for epoch in range(num_epochs):
-   total_loss = 0.0
-   total_correct = 0
-   total_samples = 0
-
-
-   for images, labels in tqdm(dataloader, desc=f'Epoch {epoch+1}/{num_epochs}'):
-       optimizer.zero_grad()
-       output = model(images)
-       loss = criterion(output, labels)
-       loss.backward()
-       optimizer.step()
-
-
-       # Calculate accuracy
-       with torch.no_grad():
-           total_loss += loss.item() * images.size(0)
-           total_samples += images.size(0)
-           # Calculate accuracy based on Euclidean distance
-           predicted_eye_positions = output.view(-1, 2, 2)
-           ground_truth_eye_positions = labels.view(-1, 2, 2)
-           error = torch.norm(predicted_eye_positions - ground_truth_eye_positions, dim=2)
-           correct_predictions = (error < threshold).sum().item()
-           total_correct += correct_predictions
-
-
-   # Print epoch statistics
-   epoch_loss = total_loss / total_samples
-   epoch_accuracy = total_correct / total_samples
-   print(f'Epoch {epoch+1}/{num_epochs}, Loss: {epoch_loss}, Accuracy: {epoch_accuracy}')
+    total_loss = 0.0
+    total_iou = 0.0
+    total_samples = 0
+    for images, labels in tqdm(dataloader, desc=f'Epoch {epoch+1}/{num_epochs}'):
+        optimizer.zero_grad()
+        output = model(images)
+        loss = criterion(output, labels)
+        loss.backward()
+        optimizer.step()
+        with torch.no_grad():
+            total_loss += loss.item() * images.size(0)
+            total_samples += images.size(0)
+            predicted_eye_positions = output.view(-1, 2, 2)
+            ground_truth_eye_positions = labels.view(-1, 2, 2)
+            for i in range(predicted_eye_positions.size(0)):
+                iou_sum = 0.0
+                for j in range(2):
+                    pred_box = point_to_box(predicted_eye_positions[i, j, 0], predicted_eye_positions[i, j, 1], radius)
+                    true_box = point_to_box(ground_truth_eye_positions[i, j, 0], ground_truth_eye_positions[i, j, 1], radius)
+                    iou_sum += calculate_iou(pred_box, true_box)
+                total_iou += iou_sum / 2
+    epoch_loss = total_loss / total_samples
+    epoch_iou = total_iou / total_samples
+    print(f'Epoch {epoch+1}/{num_epochs}, Loss: {epoch_loss}, IoU: {epoch_iou}')
 
 
 
@@ -160,36 +158,3 @@ for epoch in range(num_epochs):
 torch.save(model.state_dict(), 'simple_cnn_model.pth')
 
 
-
-# testing on accuracy of model
-# Load the image
-# face_image = Image.open('./test.jpeg')
-
-
-# # Preprocess the image
-# preprocess = transforms.Compose([
-#     transforms.Resize((384, 286)),
-#     transforms.Grayscale(),  # Convert to grayscale
-#     transforms.ToTensor(),
-#     transforms.Normalize(mean=[0.5], std=[0.5])
-# ])
-
-
-# # Apply preprocessing
-# input_image = preprocess(face_image).unsqueeze(0)  # Add batch dimension
-
-
-# # Pass the preprocessed image through the model
-# with torch.no_grad():
-#     model.eval()  # Set the model to evaluation mode
-#     output = model(input_image)
-
-
-# # Get the predicted eye positions
-# predicted_eye_positions = output.view(2, 2)
-
-
-# # Visualize the image with predicted eye positions
-# plt.imshow(face_image, cmap='gray')
-# plt.scatter(predicted_eye_positions[:, 0], predicted_eye_positions[:, 1], c='r', marker='o')
-# plt.show()
