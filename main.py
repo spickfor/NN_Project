@@ -109,7 +109,9 @@ transform = transforms.Compose([
 dataset = BioIDFaceDataset(data_folder='BioID-FaceDatabase-V1', transform=transform)
 
 # Create a DataLoader
-dataloader = DataLoader(dataset, batch_size=4, shuffle=True)
+# dataloader = DataLoader(dataset, batch_size=4, shuffle=True)
+dataloader = DataLoader(dataset, batch_size=8, shuffle=True)
+
 
 # testing to make sure loaded properly
 print(f'Length of dataset: {len(dataset)}')
@@ -120,7 +122,8 @@ print(f'Length of dataset: {len(dataset)}')
 model = SimpleCNN()
 # loss func
 criterion = nn.MSELoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+# optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.0005)
 
 
 # Training loop
