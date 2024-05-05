@@ -169,3 +169,30 @@ was good at putting points pretty close to the center of the eye, it struggles t
 
 Contributions:
 Seth: 
+- Wrote code for using MTCNN to get eye positions for comparing our test dataset to our model's predictions
+- Wrote code that outputs picture of MTCNN predictions (blue) vs ours(red)
+- Wrote multiple scripts for finding best lr,batch size, and epochs
+- Wrote code for resizing test dataset
+- Changed model to be a deeper CNN
+- Wrote code for testing accuracy of deeper CNN on test dataset
+
+
+Alex:
+- Found Georgia tech dataset used as test set
+- Wrote code for resizing and converting to grayscale 
+- Wrote code for measuring gaussian distance accuracy on test set
+- Wrote scripts to try to find best parameters for models
+
+
+RUNNING MODEL:
+Go to link for google drive and pull the enhanced_cnn_model.pth, which is the model trained on the deeper NN.
+You can then run the enhanced_mtcnn_eyePosition.py, which is currently going to run on our test dataset, but you can also comment
+out the current "image_path" variable setting to one of the other images to change it to a photo from the training or validation
+sets.
+You should have the following packages installed:
+- opencv-python
+- mtcnn
+- torch
+- torchvision
+- Pillow
+- numpy
