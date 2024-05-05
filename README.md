@@ -113,3 +113,59 @@ For the model, Seth did Dataloading/preprocessing as well as the creation of the
 running it
 
 Link for the simple_cnn_model.pth file in Google Drive:  https://drive.google.com/drive/folders/1T1YN1qIgAQNGEo2e4YdpmSa_vyxQdLrd?usp=sharing 
+
+
+## Part 4
+The database that we got for our test database comes from Georgia Tech.  It is called "Georgia Tech face database" and can be found
+at this link https://academictorrents.com/details/0848b2c9b40e49041eff85ac4a2da71ae13a3e4f .  This database is 128MB and contains
+images of 50 different people, each of which have 15 photos.  These photos are color, which varies from our validation dataset, which
+meant that I had to make sure that they were converted to greyscale before I could feed them to the network. The images are also
+described as having a "cluttered background," but this doesn't vary too much from the validation dataset because that also has
+backgrounds that aren't one color or set across the board.  An additional difference between the validation and testing datasets was
+the resolution/image size.  Our validatino dataset was 384x286 pixels whereas the testing dataset from Georgia Tech was 640x480 pixels.
+This led to me writing a script that would take the images from our testing dataset and scale them down to the proper size to fit 
+our model.  Another difference between the validation and testing datasets is that the validation dataset is extremely similar in all
+of its photos.  In the BioID dataset, each person is facing straight ahead and is making similar faces, whereas in the Georgia Tech
+dataset, they vary in expression, headtilt, and direction that their head is facing (ie. it could be turned a bit to the side). 
+Additionally, the Georgia Tech dataset has the people in the photo being further from the camera generally, which means that for
+the most part they are smaller in the photos when scaled down and they also have more of their body included, whereas for BioID
+it mainly focuses on the head with less of the body.  The differences are definitely sufficient to test the ability of our NN to
+generalize on new and unseen data.  I say this because the the BioID dataset is very set, by which I mean that all the images are 
+pretty similar.  So most different photos from other datasets that have a face would have a good deal of visual differences with the BioID dataset. 
+
+The classification accuracy for the test set was about 3 percent.  This is a different measurement of accuracy than we used for the 
+last submission.  We moved from using gaussian distance and classifying the model as accurate if it could put the point within 5 
+pixels to using using IoU because that is what the professor suggested. 
+
+We believe that the classification accuracy on the test set was worse for a few reasons.  First, we believe that it is because of the 
+extreme similarity between photos within the training set.  Because the photos are similar, this we think that this leads to models 
+trained on the dataset overfitting more easily because they tend to see the same patterns over and over with little variation that
+they can use to learn to generalize with.  So when presented with a different dataset that varies significantly from these repeated
+patterns in BioID's dataset, the model tends to do a poor job generalizing on the new data.  To fix these issues, we tried to include
+data augmentation such as color and and contrast incorporation.  However, these augmentations didn't seem to have a large impact on
+the accuracy of the model and even tended to make it perform more poorly on seen data without having much improvement on unseen.
+I think that we could have also added some geometric augmentations to the data, nothing crazy like flips or large turns ( that isn't
+usefule for this model because people tend to not be upsidedown or sideways), but more like small degree tilts.  I think that this 
+would have helped the model with learning how to predict eye position for tilted heads since the BioID photos all had the person with 
+their head straight up and down.  Second, it is probably because our model really isn't complex enough.  We started out with a CNN
+that had 2 Convolutional Layers and 2 Fully connected layers, but this model wasn't amazing, getting low IoU accuracy scores.  We then shifted to a more complex model with 4 convolutional Layers, each followed by batch normalization, and 2 fully connected layers.  This
+model seemed to perform better on training, validation, and testing datasets, which leads us to believe that even more complexity in
+our model would further benefit accuracy and generalization.  Of course, it would be good to add in the extra data augmentation 
+mentioned earlier to increase the differences of the data and allow the more complex model to not get overfitted. Third, a reason
+that the model accuracy measured for the test data could be worse is variability in eye appearance.  We noticed that the model does
+worse for its predictions when it is calculating on eyes that aren't fully open.  It seemed to place the points on the eyelids 
+instead of on the eyes.  Since the people are making different expressions in the test dataset, that means that their eyes look
+different than simply staring at the camera, which could be causing the model problems.  To fix this, I think it brings it back
+to needing a more diverse dataset so that the model can learn more eye looks.  Finally, but most unlikely, there could just be an
+issue with the code that calculates accuracy on the test dataset.  We could have messed up using MTCNN or improperly preprocessed
+the data, however, this probably isn't the issue.
+
+Something that we noticed when testing accuracies on our training and validation subsets is that the model actually does quite well
+if your accuracy measurement is gaussian distance.  We were getting that the model could predict the coordinates of the eyes within
+5 pixels 80-90 percent of the time, whereas for the IoU we were gettting usually a max of .45.  So this told us that while our model 
+was good at putting points pretty close to the center of the eye, it struggles to place the points exactly in the center of the eye.
+
+
+
+Contributions:
+Seth: 

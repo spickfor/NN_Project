@@ -2,7 +2,7 @@
 
 
 import torch
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset, DataLoader, random_split
 from torchvision import transforms
 import torch.nn as nn
 import torch.nn.functional as F
@@ -10,14 +10,6 @@ import os
 import glob
 from PIL import Image
 from tqdm import tqdm
-
-
-import matplotlib.pyplot as plt
-import numpy as np
-# from sklearn.model_selection import ParameterGrid
-
-
-
 
 # this is our data loading and preprocessing
 class BioIDFaceDataset(Dataset):
@@ -109,9 +101,7 @@ transform = transforms.Compose([
 dataset = BioIDFaceDataset(data_folder='BioID-FaceDatabase-V1', transform=transform)
 
 # Create a DataLoader
-# dataloader = DataLoader(dataset, batch_size=4, shuffle=True)
-dataloader = DataLoader(dataset, batch_size=8, shuffle=True)
-
+dataloader = DataLoader(dataset, batch_size=4, shuffle=True)
 
 # testing to make sure loaded properly
 print(f'Length of dataset: {len(dataset)}')
@@ -120,44 +110,3 @@ print(f'Length of dataset: {len(dataset)}')
   
 # Model create
 model = SimpleCNN()
-# loss func
-criterion = nn.MSELoss()
-# optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-optimizer = torch.optim.Adam(model.parameters(), lr=0.0005)
-
-
-# Training loop
-radius = 5      # our radius for IoU 
-num_epochs = 15
-for epoch in range(num_epochs):
-    total_loss = 0.0
-    total_iou = 0.0
-    total_samples = 0
-    for images, labels in tqdm(dataloader, desc=f'Epoch {epoch+1}/{num_epochs}'):
-        optimizer.zero_grad()
-        output = model(images)
-        loss = criterion(output, labels)
-        loss.backward()
-        optimizer.step()
-        with torch.no_grad():
-            total_loss += loss.item() * images.size(0)
-            total_samples += images.size(0)
-            predicted_eye_positions = output.view(-1, 2, 2)
-            ground_truth_eye_positions = labels.view(-1, 2, 2)
-            for i in range(predicted_eye_positions.size(0)):
-                iou_sum = 0.0
-                for j in range(2):
-                    pred_box = point_to_box(predicted_eye_positions[i, j, 0], predicted_eye_positions[i, j, 1], radius)
-                    true_box = point_to_box(ground_truth_eye_positions[i, j, 0], ground_truth_eye_positions[i, j, 1], radius)
-                    iou_sum += calculate_iou(pred_box, true_box)
-                total_iou += iou_sum / 2
-    epoch_loss = total_loss / total_samples
-    epoch_iou = total_iou / total_samples
-    print(f'Epoch {epoch+1}/{num_epochs}, Loss: {epoch_loss}, IoU: {epoch_iou}')
-
-
-
-# Save the model's state dictionary
-torch.save(model.state_dict(), 'simple_cnn_model.pth')
-
-
