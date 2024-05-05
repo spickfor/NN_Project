@@ -39,9 +39,10 @@ def load_model(model_path):
 detector = MTCNN()
 
 # Load an image
-image_path = 'BioID_0000.pgm'
+#image_path = 'BioID_0000.pgm'
 # image_path = 'BioID_0016 copy.pgm'
 # image_path = 'test.jpeg'
+image_path = '09.jpg'
 
 image = cv2.imread(image_path)
 rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
